@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Genre;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class GenreController extends Controller
 {
@@ -12,6 +13,11 @@ class GenreController extends Controller
      */
     public function index()
     {
+        $user = Auth::user();
+        if ($user->role != 'admin') {
+            return redirect()->back()->with('error', 'Hanya admin yang dapat mengakses halaman ini');
+        }
+
         $genres = Genre::latest()->get();
         return view('genres.index', compact('genres'));
     }
@@ -21,6 +27,11 @@ class GenreController extends Controller
      */
     public function create()
     {
+        $user = Auth::user();
+        if ($user->role != 'admin') {
+            return redirect()->back()->with('error', 'Hanya admin yang dapat mengakses halaman ini');
+        }
+
         return view('genres.create');
     }
 
@@ -29,6 +40,11 @@ class GenreController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+        if ($user->role != 'admin') {
+            return redirect()->back()->with('error', 'Hanya admin yang dapat mengakses halaman ini');
+        }
+
         $request->validate(['nama' => 'required|unique:genres']);
         Genre::create($request->all());
         return redirect()->route('genres.index')->with('success', 'Genre berhasil ditambah!');
@@ -47,6 +63,11 @@ class GenreController extends Controller
      */
     public function edit(Genre $genre)
     {
+        $user = Auth::user();
+        if ($user->role != 'admin') {
+            return redirect()->back()->with('error', 'Hanya admin yang dapat mengakses halaman ini');
+        }
+
         return view('genres.edit', compact('genre'));
     }
 
@@ -55,6 +76,11 @@ class GenreController extends Controller
      */
     public function update(Request $request, Genre $genre)
     {
+        $user = Auth::user();
+        if ($user->role != 'admin') {
+            return redirect()->back()->with('error', 'Hanya admin yang dapat mengakses halaman ini');
+        }
+
         $request->validate(['nama' => 'required|unique:genres,nama,' . $genre->id]);
         $genre->update($request->all());
         return redirect()->route('genres.index')->with('success', 'Genre berhasil diupdate!');
@@ -65,6 +91,11 @@ class GenreController extends Controller
      */
     public function destroy(Genre $genre)
     {
+        $user = Auth::user();
+        if ($user->role != 'admin') {
+            return redirect()->back()->with('error', 'Hanya admin yang dapat mengakses halaman ini');
+        }
+        
         $genre->delete();
         return back()->with('success', 'Genre berhasil dihapus!');
     }
