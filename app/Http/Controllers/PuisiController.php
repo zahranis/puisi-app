@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Puisi;
 use App\Models\Genre;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class PuisiController extends Controller
@@ -19,8 +20,18 @@ class PuisiController extends Controller
      */
     public function index()
     {
-        $puisis = Puisi::with(['user', 'genre'])->latest()->get();
+        $puisis = Puisi::with(['user', 'genre'])
+            ->paginate(15);
         return view('puisis.index', compact('puisis'));
+    }
+
+    public function my()
+    {
+        $puisis = Puisi::with(['user', 'genre'])
+            ->where('user_id', Auth::id())
+            ->paginate(25);
+
+        return view('puisis.mypuisi', compact('puisis'));
     }
 
     /**
@@ -46,13 +57,13 @@ class PuisiController extends Controller
         ]);
 
         if ($request->hasFile('gambar')) {
-            $data['gambar'] = $request->file('gambar')->store('puisi-images');
+            $data['gambar'] = $request->file('gambar')->store('puisi-images', 'public');
         }
 
         $data['user_id'] = auth()->id();
         Puisi::create($data);
 
-        return redirect()->route('puisis.index')->with('success', 'Puisi berhasil ditambah!');
+        return redirect()->route('puisis.mypuisi')->with('success', 'Puisi berhasil ditambah!');
     }
     /**
      * Display the specified resource.
@@ -67,7 +78,9 @@ class PuisiController extends Controller
      */
     public function edit(Puisi $puisi)
     {
-        $this->authorize('update', $puisi);
+        if (auth()->id() !== $puisi->user_id) {
+            abort(403);
+        }
         $genres = Genre::all();
         return view('puisis.edit', compact('puisi', 'genres'));
     }
@@ -77,7 +90,9 @@ class PuisiController extends Controller
      */
     public function update(Request $request, Puisi $puisi)
     {
-        $this->authorize('update', $puisi);
+        if (auth()->id() !== $puisi->user_id) {
+            abort(403);
+        }
 
         $data = $request->validate([
             'judul' => 'required',
@@ -89,11 +104,11 @@ class PuisiController extends Controller
 
         if ($request->hasFile('gambar')) {
             if ($puisi->gambar) Storage::delete($puisi->gambar);
-            $data['gambar'] = $request->file('gambar')->store('puisi-images');
+            $data['gambar'] = $request->file('gambar')->store('puisi-images', 'public');
         }
 
         $puisi->update($data);
-        return redirect()->route('puisis.index')->with('success', 'Puisi berhasil diupdate!');
+        return redirect()->route('puisis.mypuisi')->with('success', 'Puisi berhasil diupdate!');
     }
 
     /**
@@ -101,8 +116,11 @@ class PuisiController extends Controller
      */
     public function destroy(Puisi $puisi)
     {
-        $this->authorize('delete', $puisi);
-        if ($puisi->gambar) Storage::delete($puisi->gambar);
+        if (auth()->id() !== $puisi->user_id && auth()->user()->role !== 'admin') {
+            abort(403);
+        }
+
+        if ($puisi->gambar && Storage::disk('public')->exists($puisi->gambar)) Storage::disk('public')->delete($puisi->gambar);
         $puisi->delete();
         return back()->with('success', 'Puisi berhasil dihapus!');
     }

@@ -1,30 +1,31 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Puisi Baru')
+@section('title', 'Edit Puisi')
 
 @section('content')
     <div class="card">
-        <div class="card-header bg-primary text-white fs-5">
-            <i class="bi bi-plus-circle me-1"></i> Tambah Puisi Baru
+        <div class="card-header bg-warning text-dark fs-5">
+            <i class="bi bi-pencil-square me-1"></i> Edit Puisi: <strong>{{ $puisi->judul }}</strong>
         </div>
         <div class="card-body">
-            <form action="{{ route('puisis.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('puisis.update', $puisi->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
+                @method('PUT')
 
                 <!-- Judul -->
                 <div class="mb-3">
                     <label for="judul" class="form-label">Judul</label>
                     <input type="text" class="form-control @error('judul') is-invalid @enderror" id="judul"
-                        name="judul" value="{{ old('judul') }}" required>
+                        name="judul" value="{{ old('judul', $puisi->judul) }}" required>
                     @error('judul')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
-                <!-- Isi -->
+                <!-- Isi Puisi -->
                 <div class="mb-3">
                     <label for="isi" class="form-label">Isi Puisi</label>
-                    <textarea class="form-control @error('isi') is-invalid @enderror" id="isi" name="isi" rows="5" required>{{ old('isi') }}</textarea>
+                    <textarea class="form-control @error('isi') is-invalid @enderror" id="isi" name="isi" rows="5" required>{{ old('isi', $puisi->isi) }}</textarea>
                     @error('isi')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -34,7 +35,7 @@
                 <div class="mb-3">
                     <label for="penulis" class="form-label">Penulis</label>
                     <input type="text" class="form-control @error('penulis') is-invalid @enderror" id="penulis"
-                        name="penulis" value="{{ old('penulis') }}" required>
+                        name="penulis" value="{{ old('penulis', $puisi->penulis) }}" required>
                     @error('penulis')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -47,7 +48,8 @@
                         required>
                         <option value="">Pilih genre</option>
                         @foreach ($genres as $genre)
-                            <option value="{{ $genre->id }}" {{ old('genre_id') == $genre->id ? 'selected' : '' }}>
+                            <option value="{{ $genre->id }}"
+                                {{ old('genre_id', $puisi->genre_id) == $genre->id ? 'selected' : '' }}>
                                 {{ $genre->nama }}
                             </option>
                         @endforeach
@@ -65,15 +67,22 @@
                     @error('gambar')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
+
+                    @if ($puisi->gambar)
+                        <div class="mt-2">
+                            <img src="{{ asset('storage/' . $puisi->gambar) }}" alt="Gambar Puisi"
+                                style="max-height: 150px;" class="img-thumbnail">
+                        </div>
+                    @endif
                 </div>
 
-                <!-- Tombol -->
+                <!-- Submit -->
                 <div class="d-flex justify-content-between">
                     <a href="javascript:history.back()" class="btn btn-secondary">
                         <i class="bi bi-arrow-left me-1"></i> Kembali
                     </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save me-1"></i> Simpan
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-check-circle me-1"></i> Update
                     </button>
                 </div>
             </form>

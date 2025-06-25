@@ -18,7 +18,7 @@ class GenreController extends Controller
             return redirect()->back()->with('error', 'Hanya admin yang dapat mengakses halaman ini');
         }
 
-        $genres = Genre::latest()->get();
+        $genres = Genre::paginate(25);
         return view('genres.index', compact('genres'));
     }
 

@@ -46,7 +46,7 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
-            return redirect()->intended('/puisi');
+            return redirect()->intended('/');
         }
 
         return back()->withErrors(['email' => 'Login gagal!']);
@@ -56,6 +56,6 @@ class AuthController extends Controller
     public function logout()
     {
         Auth::logout();
-        return redirect('/login');
+        return redirect('/');
     }
 }

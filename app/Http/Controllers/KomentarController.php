@@ -17,13 +17,16 @@ class KomentarController extends Controller
             'user_id' => auth()->id()
         ]);
 
-        return back()->with('success', 'Komentar berhasil ditambah!');
+        return back();
     }
 
     public function destroy(Komentar $komentar)
     {
-        $this->authorize('delete', $komentar);
+        if (auth()->id() !== $komentar->user_id && auth()->user()->role !== 'admin') {
+            abort(403);
+        }
+
         $komentar->delete();
-        return back()->with('success', 'Komentar berhasil dihapus!');
+        return back();
     }
 }

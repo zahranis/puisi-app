@@ -8,12 +8,12 @@
             <div class="col-md-8">
                 @if (auth()->user()->role !== 'admin')
                     <div class="alert alert-danger">
-                        <i class="bi bi-exclamation-circle"></i> Akses ditolak! Hanya admin yang bisa mengedit genre.
+                        <i class="bi bi-exclamation-circle me-1"></i> Akses ditolak! Hanya admin yang bisa mengedit genre.
                     </div>
                 @else
                     <div class="card shadow-sm">
-                        <div class="card-header bg-warning text-dark">
-                            <h5 class="mb-0">Edit Genre: {{ $genre->nama }}</h5>
+                        <div class="card-header bg-warning text-dark fs-5">
+                            <i class="bi bi-pencil-square me-1"></i> Edit Genre: <strong>{{ $genre->nama }}</strong>
                         </div>
                         <div class="card-body">
                             <form action="{{ route('genres.update', $genre->id) }}" method="POST">
@@ -24,17 +24,15 @@
                                     <input type="text" class="form-control @error('nama') is-invalid @enderror"
                                         id="nama" name="nama" value="{{ old('nama', $genre->nama) }}" required>
                                     @error('nama')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
+                                        <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="d-flex justify-content-between">
                                     <a href="{{ route('genres.index') }}" class="btn btn-secondary">
-                                        <i class="bi bi-arrow-left"></i> Batal
+                                        <i class="bi bi-arrow-left me-1"></i> Batal
                                     </a>
                                     <button type="submit" class="btn btn-warning">
-                                        <i class="bi bi-pencil-square"></i> Update
+                                        <i class="bi bi-check-circle me-1"></i> Update
                                     </button>
                                 </div>
                             </form>

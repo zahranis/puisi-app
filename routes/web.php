@@ -15,6 +15,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // CRUD Route
 Route::resource('genres', GenreController::class)->middleware('auth');
+Route::get('/puisis/my', [PuisiController::class, 'my'])
+    ->name('puisis.mypuisi')
+    ->middleware('auth');
 Route::resource('puisis', PuisiController::class);
 Route::post('/puisis/{puisi}/komentars', [KomentarController::class, 'store'])->name('komentars.store');
 Route::delete('/komentars/{komentar}', [KomentarController::class, 'destroy'])->name('komentars.destroy');
